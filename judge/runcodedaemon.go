@@ -18,7 +18,7 @@ func main() {
 		return
 	}
 
-	chanRoutine := controlroutine.NewChanRoutine(2)
+	chanRoutine := controlroutine.NewChanRoutine(8)
 
 	for {
 		cid, flag, err := db.GetCodeId(Db, chanRoutine) //查到未运行的代码
