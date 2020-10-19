@@ -19,7 +19,7 @@ func main() {
 		return
 	}
 
-	chanRoutine := controlroutine.NewChanRoutine(2)
+	chanRoutine := controlroutine.NewChanRoutine(8)
 
 	for {
 		cid, err := db.GetCompareId(Db, chanRoutine) //查到未运行的对拍
