@@ -28,7 +28,7 @@ judgepro.cpp中的代码是fork出子进程，子进程去跑对拍的c++代码�
 
 这里主要是加强对go语言的熟悉，所以把代码对拍平台中守护进程部分重构了一下，写的不规范，多数地方做得不够好望大家见谅。
 
-想去体验一下的可以看看：xtdlb.cn 账号密码都是development        (chrome)
+想去体验一下的可以看看：xtdlb.cn(或者是http://xtdlb.cn/code-evaluation/production/login.html) 账号密码都是development        (chrome)
 
 
 
