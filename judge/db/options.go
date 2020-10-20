@@ -3,7 +3,7 @@ package db
 import "fmt"
 
 var (
-	DbMysql = fmt.Sprintf("user:pwd.@tcp(127.0.0.1:3306)/code_evaluation")//mysql配置
+	DbMysql = fmt.Sprintf("user:pwd@tcp(127.0.0.1:3306)/code_evaluation")//mysql配置
 )
 
 //代码对拍表

@@ -8,6 +8,7 @@ import (
 	"judge/dockerexec"
 	"judge/environment"
 	"judge/judgetools"
+	"judge/zapconf"
 	"os"
 	"strings"
 	"time"
@@ -43,14 +44,17 @@ func RunCodeGetResult(codePath string, nowDate string, runPath string, codeId st
 	runCodeName := runName + ".cpp"
 	err := judgetools.ExecCp(codePath, runCodeName)
 	if err != nil {
+		zapconf.GetWarnLog().Warn("cp error")
 		return "", "", "", "", ""
 	}
 	err = judgetools.ExecCp(environment.CompareJudgePath, runRootPath)
 	if err != nil {
+		zapconf.GetWarnLog().Warn("cp error")
 		return "", "", "", "", ""
 	}
 	err = judgetools.ExecGcc(runName, runCodeName)
 	if err != nil {
+		zapconf.GetWarnLog().Warn("g++ error")
 		return "", "", "", "", ""
 	}
 
@@ -76,7 +80,7 @@ func RunCodeGetResult(codePath string, nowDate string, runPath string, codeId st
 		fmt.Println("msgfile path:", msgPath)
 		msgF, err := ioutil.ReadFile(msgPath)
 		if err != nil {
-			fmt.Println("read fail", err)
+			zapconf.GetWarnLog().Warn("read failed: " + err.Error())
 		}
 		fmt.Println("msgf:", msgF)
 		codeMsg = string(msgF)

@@ -8,6 +8,7 @@ import (
 	"judge/controlroutine"
 	"judge/judgetools"
 	_ "github.com/go-sql-driver/mysql"
+	"judge/zapconf"
 )
 
 func GetCompareId(conn *sql.DB, cr *controlroutine.ChanRoutine) (string, error) {
@@ -21,6 +22,7 @@ func GetCompareId(conn *sql.DB, cr *controlroutine.ChanRoutine) (string, error) 
 
 	cr.AddGoRoutine()
 	if !updateRunCompareVersion(conn, cid) {
+		zapconf.GetWarnLog().Warn("update version error")
 		panic("update version error")
 	}
 	return cid, nil
@@ -31,7 +33,7 @@ func updateRunCompareVersion(conn *sql.DB, cid string) bool {
 	fmt.Println(sqlData)
 	_, upErr := conn.Exec(sqlData)
 	if upErr != nil {
-		fmt.Println("update error:", upErr)
+		zapconf.GetWarnLog().Warn("update error: " + upErr.Error())
 		return false
 	}
 	return true
@@ -43,8 +45,7 @@ func GetEvaCompareWithCompareId(conn *sql.DB, cid string) (*EvaCompare, error) {
 	myCompare := &EvaCompare{}
 	qErr := conn.QueryRow(takeCodeIdSql).Scan(&myCompare.CompareId, &myCompare.CompareName, &myCompare.UserId, &myCompare.FirstCodeId, &myCompare.SecondCodeId, &myCompare.InputDataPath, &myCompare.MaxInputGroup, &myCompare.CreateTime, &myCompare.UpdateTime, &myCompare.Remarks)
 	if qErr != nil {
-		fmt.Println("select eva_compare error")
-		fmt.Println(qErr)
+		zapconf.GetWarnLog().Warn("select eva_compare error: " + qErr.Error())
 		return &EvaCompare{}, errors.New("select eva_compare error")
 	}
 	fmt.Println(myCompare)
@@ -56,7 +57,7 @@ func GetEvaCodePathWithCodeId(conn *sql.DB, cid string) (string, error) {
 	path := ""
 	fcpErr := conn.QueryRow(takeCodePathSql).Scan(&path)
 	if fcpErr != nil {
-		fmt.Println("select code path error: ", fcpErr)
+		zapconf.GetWarnLog().Warn("select code path error: " + fcpErr.Error())
 		return "", fcpErr
 	}
 	return path, nil
@@ -108,7 +109,7 @@ func InsertData(firstCodeMsg CodeRunData, secondCodeMsg CodeRunData, compareId s
 	//把这条数据存入 或者判断不对等就flag=true 跳过后面的对拍
 	_, inErr := Db.Exec(updateSql)
 	if inErr != nil {
-		fmt.Println("update error")
+		zapconf.GetWarnLog().Warn("update error")
 		panic(inErr)
 	}
 
@@ -126,6 +127,7 @@ func GetCodeId(conn *sql.DB, cr *controlroutine.ChanRoutine) (string, string, er
 	}
 	cr.AddGoRoutine()
 	if !updateRunCodeVersion(conn, cid, uid, flag) {
+		zapconf.GetErrorLog().Error("update version error")
 		panic("update version error")
 	}
 	return cid, flag, nil
@@ -135,7 +137,7 @@ func updateRunCodeVersion(conn *sql.DB, cid string, uid string, flag string) boo
 	sqlData := "update run_code set version = 1 where code_id = " + cid + " and user_id = " + uid + " and select_flag = '" + flag + "'"
 	_, upErr := conn.Exec(sqlData)
 	if upErr != nil {
-		fmt.Println("update error:", upErr)
+		zapconf.GetErrorLog().Error("update error:" + upErr.Error())
 		return false
 	}
 	return true
@@ -147,8 +149,7 @@ func GetEvaCodeWithCodeId(conn *sql.DB, cid string) (*EvaCode, error) {
 	myCode := &EvaCode{}
 	qErr := conn.QueryRow(takeCodeIdSql).Scan(&myCode.CodeId, &myCode.CodeName, &myCode.UserId, &myCode.CodeText, &myCode.Path, &myCode.CreateTime, &myCode.UpdateTime)
 	if qErr != nil {
-		fmt.Println("select eva_code error")
-		fmt.Println(qErr)
+		zapconf.GetWarnLog().Warn("select eva_code error" + qErr.Error())
 		return &EvaCode{}, errors.New("select eva_code error")
 	}
 	fmt.Println(myCode)
@@ -161,8 +162,7 @@ func GetRunCodeWithCodeId(conn *sql.DB, cid string, uid string, flag string) (*r
 	myRunCode := &runCode{}
 	rcErr := conn.QueryRow(takeRunCodeSql).Scan(&myRunCode.CodeId, &myRunCode.UserId, &myRunCode.InputPath)
 	if rcErr != nil {
-		fmt.Println("select run_code error")
-		fmt.Println(rcErr)
+		zapconf.GetWarnLog().Warn("select run_code error" + rcErr.Error())
 		return &runCode{}, errors.New("select run_code error")
 	}
 	return myRunCode, nil
@@ -174,7 +174,7 @@ func UpdateRunCodeEndMsg(conn *sql.DB, code_id string, user_id string, outputFil
 	//defer conn.Close()
 	_, upErr := conn.Exec(sqlData)
 	if upErr != nil {
-		fmt.Println("update error: ", upErr)
+		zapconf.GetErrorLog().Error("update error: " + upErr.Error())
 		return false
 	}
 	return true

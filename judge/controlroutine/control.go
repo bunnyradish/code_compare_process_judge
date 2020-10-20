@@ -1,5 +1,7 @@
 package controlroutine
 
+import "judge/zapconf"
+
 /*
 控制协程数量
 */
@@ -21,6 +23,7 @@ func (cr *ChanRoutine) DelGoRoutine() {
 	select {
 	case <- cr.ch:
 	default:
+		zapconf.GetInfoLog().Info("del chan err")
 		panic("del chan err")
 	}
 }

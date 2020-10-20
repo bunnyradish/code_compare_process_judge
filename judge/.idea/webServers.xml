@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="d5fb0ac1-3957-4da2-9ec4-da8484107779" name="e">
+        <fileTransfer rootFolder="/zt/go/src" accessType="SFTP" host="47.107.83.200" port="22" sshConfigId="e8f45bdd-df92-4e0a-919e-d6dcd1522a0d" sshConfig="root@47.107.83.200:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

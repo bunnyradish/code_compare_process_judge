@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"judge/zapconf"
 	"os"
 	"os/exec"
 )
@@ -33,7 +34,7 @@ func IsExist(path string) bool {
 func FastCreateFile(path string) {
 	createErr := CreateFile(path)
 	if createErr != nil {
-		fmt.Println("create file error: ", createErr)
+		zapconf.GetWarnLog().Warn("create file error: " + createErr.Error())
 		panic(createErr)
 	}
 }
@@ -42,7 +43,7 @@ func DelFile(path string) error {
 	cmd := exec.Command("rm", "-rf", path)
 	err := cmd.Run()
 	if err != nil {
-		fmt.Println("del file: " + path + " error: ", err)
+		zapconf.GetInfoLog().Info("create file error: " + err.Error())
 		return err
 	}
 	return nil
@@ -51,7 +52,7 @@ func DelFile(path string) error {
 func FastDelFile(path string) {
 	delErr := DelFile(path)
 	if delErr != nil {
-		fmt.Println("create file error: ", delErr)
+		zapconf.GetErrorLog().Error("create file error: " + delErr.Error())
 		panic(delErr)
 	}
 }

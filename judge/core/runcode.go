@@ -11,6 +11,7 @@ import (
 	"judge/dockerexec"
 	"judge/environment"
 	"judge/judgetools"
+	"judge/zapconf"
 	"os"
 	"strconv"
 	"strings"
@@ -37,12 +38,12 @@ func StartRunCode(Db *sql.DB, cid string, flag string, cr *controlroutine.ChanRo
 	}
 	outputFile, msgFile, err := RunCode(myCode.Path, judgetools.GetMillisecond(), runPath, strconv.Itoa(myRunCode.CodeId), strconv.Itoa(myRunCode.UserId), myRunCode.InputPath, ioPath, codeGoPath)
 	if err != nil {
-		fmt.Println("run code err: ", err)
+		zapconf.GetWarnLog().Warn("run code err: " + err.Error())
 		return
 	}
 	//把输出文件以及运行信息文件的路径返回来。应该用数据库来接收此信息
 	if !db.UpdateRunCodeEndMsg(Db, strconv.Itoa(myRunCode.CodeId), strconv.Itoa(myRunCode.UserId), outputFile, msgFile, flag) {
-		fmt.Println("update err last msg")
+		zapconf.GetInfoLog().Info("update err last msg")
 	}
 	cr.DelGoRoutine()
 }
@@ -52,14 +53,17 @@ func RunCode(codePath string, nowDate string, runPath string, codeId string, use
 	runCodeName := runName + ".cpp"
 	err := judgetools.ExecCp(codePath, runCodeName)
 	if err != nil {
+		zapconf.GetWarnLog().Warn("cp error")
 		return "", "", errors.New("cp error")
 	}
 	err = judgetools.ExecCp(environment.CodeJudgePath, codeGoPath)
 	if err != nil {
+		zapconf.GetWarnLog().Warn("cp error")
 		return "", "", errors.New("cp error")
 	}
 	err = judgetools.ExecGcc(runName, runCodeName)
 	if err != nil {
+		zapconf.GetWarnLog().Warn("g++ error")
 		return "", "", errors.New("g++ " + runCodeName + " error")
 	}
 
@@ -83,7 +87,7 @@ func RunCode(codePath string, nowDate string, runPath string, codeId string, use
 		fmt.Println("msgfile path:", msgFile)
 		msgF, err := ioutil.ReadFile(msgFile)
 		if err != nil {
-			fmt.Println("read fail", err)
+			zapconf.GetWarnLog().Warn("read failed: " + err.Error())
 		}
 		fmt.Println("msgf:", msgF)
 		codeMsg = string(msgF)

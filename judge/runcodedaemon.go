@@ -2,10 +2,10 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"judge/controlroutine"
 	"judge/core"
 	"judge/db"
+	"judge/zapconf"
 )
 
 func main() {
@@ -14,11 +14,15 @@ func main() {
 	Db, err = sql.Open("mysql", db.DbMysql)
 	defer Db.Close()
 	if err != nil {
-		fmt.Println("conn database error: ", err)
+		zapconf.GetWarnLog().Warn("conn database error: " + err.Error())
+		return
+	}
+	if err = Db.Ping(); err != nil {
+		zapconf.GetWarnLog().Warn("conn database error: " + err.Error())
 		return
 	}
 
-	chanRoutine := controlroutine.NewChanRoutine(8)
+	chanRoutine := controlroutine.NewChanRoutine(2)
 
 	for {
 		cid, flag, err := db.GetCodeId(Db, chanRoutine) //查到未运行的代码

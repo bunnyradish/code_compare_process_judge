@@ -7,6 +7,7 @@ import (
 	"judge/db"
 	"judge/environment"
 	"judge/judgetools"
+	"judge/zapconf"
 	"strconv"
 )
 
@@ -29,12 +30,12 @@ func StartCompare(Db *sql.DB, cid string, cr *controlroutine.ChanRoutine) {
 	//随机输入数据的构造已完成！下面是让两个代码在各输入数据下运行的结果
 	FirstCodePath, err := db.GetEvaCodePathWithCodeId(Db, strconv.Itoa(myCompare.FirstCodeId))
 	if err != nil {
-		fmt.Println("select first code err")
+		zapconf.GetWarnLog().Warn("select first code err")
 		return
 	}
 	SecondCodePath, err := db.GetEvaCodePathWithCodeId(Db, strconv.Itoa(myCompare.SecondCodeId))
 	if err != nil {
-		fmt.Println("select second code err")
+		zapconf.GetWarnLog().Warn("select second code err")
 		return
 	}
 
@@ -51,7 +52,7 @@ func StartCompare(Db *sql.DB, cid string, cr *controlroutine.ChanRoutine) {
 			firstMsgFile := runPath + strconv.Itoa(i) + "msg.txt"               //此文件保存运行情况
 			firstCodeData.Output, firstCodeData.Status, firstCodeData.TimeUsed, firstCodeData.MemoryUsed, firstCheck = RunCodeGetResult(FirstCodePath, judgetools.GetMillisecond(), runPath, strconv.Itoa(i)+cid, firstInputFile, firstOutputFile, firstMsgFile, comparePath, strconv.Itoa(i))//在codeid那个地方要codeid+i
 			if firstCheck != "ok" {
-				fmt.Println("run code docker error")
+				zapconf.GetWarnLog().Warn("run code docker error")
 				return
 			}
 
@@ -65,7 +66,7 @@ func StartCompare(Db *sql.DB, cid string, cr *controlroutine.ChanRoutine) {
 			secondMsgFile := runPath + strconv.Itoa(i) + "msg.txt"               //此文件保存运行情况
 			secondCodeData.Output, secondCodeData.Status, secondCodeData.TimeUsed, secondCodeData.MemoryUsed, secondCheck = RunCodeGetResult(SecondCodePath, judgetools.GetMillisecond(), runPath, strconv.Itoa(i)+cid, secondInputFile, secondOutputFile, secondMsgFile, comparePath, strconv.Itoa(i))//在codeid那个地方要codeid+i
 			if secondCheck != "ok" {
-				fmt.Println("run code docker error")
+				zapconf.GetWarnLog().Warn("run code docker error")
 				return
 			}
 

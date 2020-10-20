@@ -7,6 +7,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/client"
+	"judge/zapconf"
 	"time"
 )
 
@@ -14,6 +15,7 @@ func GoDocker(hostPath string, containerPath string, workDir string, runName str
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
+		zapconf.GetErrorLog().Error(err.Error())
 		panic(err)
 	}
 	if hostPath == "" {
@@ -67,6 +69,7 @@ func GoDocker(hostPath string, containerPath string, workDir string, runName str
 			},
 		}, nil, dockerName)
 	if err != nil {
+		zapconf.GetErrorLog().Error(err.Error())
 		panic(err)
 	}
 
@@ -92,6 +95,7 @@ func DelDocker(id string) {
 		},
 	)
 	if err != nil {
+		zapconf.GetWarnLog().Warn(err.Error())
 		panic(err)
 	}
 }
@@ -100,6 +104,7 @@ func StopDocker(id string) {
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
+		zapconf.GetWarnLog().Warn(err.Error())
 		panic(err)
 	}
 	x := time.Duration(0)
@@ -107,6 +112,7 @@ func StopDocker(id string) {
 		&x,
 	)
 	if err != nil {
+		zapconf.GetErrorLog().Error(err.Error())
 		panic(err)
 	}
 }

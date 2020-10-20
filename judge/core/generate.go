@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io/ioutil"
+	"judge/zapconf"
 	"os"
 	"judge/db"
 	"judge/environment"
@@ -22,14 +23,17 @@ func GenerateInputData(runPath string, ioPath string, nowDate string, runRootPat
 	fmt.Println(compareData)
 	err := judgetools.ExecCp(compareData.InputDataPath, runCodeName)
 	if err != nil {
+		zapconf.GetWarnLog().Warn("cp error")
 		return
 	}
 	err = judgetools.ExecCp(environment.CompareJudgePath, runRootPath)
 	if err != nil {
+		zapconf.GetWarnLog().Warn("cp error")
 		return
 	}
 	err = judgetools.ExecGcc(runName, runCodeName)
 	if err != nil {
+		zapconf.GetWarnLog().Warn("g++ error")
 		return
 	}
 
@@ -40,6 +44,7 @@ func GenerateInputData(runPath string, ioPath string, nowDate string, runRootPat
 			i--
 			checkNum++
 			if checkNum > 10 {
+				zapconf.GetErrorLog().Error("cant GenerateInputRun right")
 				panic("cant GenerateInputRun right")
 			}
 		} //生成随机输入数据的运行
@@ -59,7 +64,7 @@ func GenerateInputRun(runName string, inputData string, ioPath string, nowDate s
 	fmt.Println("generatemsg: ===========", msgPath)
 	file, err := os.OpenFile(inputDataPath, os.O_CREATE|os.O_WRONLY, 0777)
 	if err != nil {
-		fmt.Println("open " + inputDataPath + "error")
+		zapconf.GetWarnLog().Warn("open " + inputDataPath + "error")
 		panic(err)
 	}
 	defer file.Close()
@@ -82,13 +87,13 @@ func GenerateInputRun(runName string, inputData string, ioPath string, nowDate s
 	}
 	myOutputFile, err := os.OpenFile(outputDataPath, os.O_RDONLY, 0777)
 	if err != nil {
-		fmt.Println("open " + outputDataPath + " error")
+		zapconf.GetWarnLog().Warn("open " + outputDataPath + " error")
 		panic(err)
 	}
 	defer myOutputFile.Close()
 	codeInputData, err := ioutil.ReadAll(myOutputFile)
 	if err != nil {
-		fmt.Println("read file: " + outputDataPath + " error")
+		zapconf.GetWarnLog().Warn("read file " + outputDataPath + " error")
 		return false
 	}
 	judgetools.FastDelFile(inputDataPath)
@@ -99,7 +104,7 @@ func GenerateInputRun(runName string, inputData string, ioPath string, nowDate s
 	fmt.Println("rlyinputpath", rlyInputPath)
 	rlyInputFile, err := os.OpenFile(rlyInputPath, os.O_CREATE|os.O_WRONLY, 0777)
 	if err != nil {
-		fmt.Println("open " + rlyInputPath + " error")
+		zapconf.GetWarnLog().Warn("open " + rlyInputPath + " error")
 		return false
 	}
 	defer rlyInputFile.Close()
